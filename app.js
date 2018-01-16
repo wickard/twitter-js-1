@@ -1,20 +1,35 @@
 const express = require('express');
 const app = express();
+const chalk = require('chalk')
 
 const logger = (req, res, next) => {
-  console.log(req.method, req.url, res.statusCode);
+  console.log(chalk.red(req.method, req.url, res.statusCode));
   next();
 };
 
 // const checkSpecial
-
-app.use(logger);
+app.param('path', (req, res, next, path) => {
+  req.path = path
+  next()
+})
 
 app.get('/', (req, res, next) => {
   res.send('Hello!');
-  next();
+  next()
 });
 
+app.get('*', (req, res, next) => {
+  if (req.path === '/special'){
+    res.send('Welcome to the special place')
+  }
+  res.statusCode = 404
+  res.send('Welcome to the pit of misery!')
+  next()
+})
+
+
+
+app.use(logger);
 app.listen(3000);
 
 
